@@ -1,35 +1,44 @@
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useApolloClient } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 const GET_NAV_LOCATION = gql`
   query GetNavLocation {
-    getNavLocation @client {
-      currentLocation
-      previousLocation
-    }
+    navLocation @client
   }
 `;
 
-export const typeDefs = gql`
-  {
-    extend
-    type
-    Query {
-      getNavLocation: NavLocation
-    }
+type NavLocationState = {
+  current: string;
+  previous: string;
+};
 
-    type
-    NavLocation {
-      currentLocation: String
-      previousLocation: String
-    }
-  }
-`;
-
-// create a hook that returns the state and a dispatch method
-
+// create a hook that returns the state NavLocation state
 export const useNavLocationState = () => {
   const { data } = useQuery(GET_NAV_LOCATION);
-  console.log("useNavLocationState fired", data);
   return data;
+};
+
+type NavLocationAction = { type: "nextLocation"; nextLocation: "home" | "map" };
+
+const navLocationDispatch = (state: NavLocationState, client) => {
+  return (action: NavLocationAction) => {
+    switch (action.type) {
+      case "nextLocation":
+        client.writeData({
+          data: {
+            navLocation: action.nextLocation
+          }
+        });
+        break;
+      default:
+        throw new Error(`Unahandled action type ${action.type}`);
+    }
+  };
+};
+
+// create a hook that can update the local state
+export const useNavLocationDispatch = () => {
+  const { navLocation } = useNavLocationState();
+  const client = useApolloClient();
+  return navLocationDispatch(navLocation, client);
 };

@@ -5,32 +5,43 @@ import { ApolloProvider } from "@apollo/react-hooks";
 import { Button } from "@material-ui/core";
 
 import AppNavigation from "./AppNavigation";
-import { typeDefs, useNavLocationState } from "./useNavLocation";
+import { useNavLocationState, useNavLocationDispatch } from "./useNavLocation";
 
 const client = new ApolloClient({
   clientState: {
     defaults: {
-      navLocation: {
-        currentLocation: "home",
-        previousLocation: "",
-        __typename: "NavLocation"
-      }
-    },
-    resolvers: [],
-    typeDefs
+      navLocation: "home"
+    }
+    // resolvers: [],
+    //typeDefs
   }
 });
 
 function App() {
-  const navLocation = useNavLocationState();
-  console.log("navlocation in app", navLocation);
+  const { navLocation } = useNavLocationState();
+  const updateNavLocation = useNavLocationDispatch();
+
+  console.log("current location", navLocation);
+
   return (
     <AppNavigation>
-      <Button variant="contained" color="secondary">
-        Map
-      </Button>
-      <Button variant="contained" color="primary">
+      <Button
+        onClick={() =>
+          updateNavLocation({ type: "nextLocation", nextLocation: "home" })
+        }
+        variant="contained"
+        color="secondary"
+      >
         Home
+      </Button>
+      <Button
+        onClick={() =>
+          updateNavLocation({ type: "nextLocation", nextLocation: "map" })
+        }
+        variant="contained"
+        color="primary"
+      >
+        Map
       </Button>
     </AppNavigation>
   );

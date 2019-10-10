@@ -1,17 +1,21 @@
 import * as React from "react";
 import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
+import {
+  Drawer,
+  CssBaseline,
+  AppBar,
+  Toolbar,
+  List,
+  Typography,
+  Divider,
+  ListItem,
+  ListItemIcon,
+  ListItemText
+} from "@material-ui/core";
 import HomeIcon from "@material-ui/icons/Home";
 import MapIcon from "@material-ui/icons/Explore";
+
+import { useNavLocationState, useNavLocationDispatch } from "./useNavLocation";
 
 const drawerWidth = 240;
 
@@ -46,6 +50,8 @@ type Props = {
 
 export default function AppNavigation({ children }: Props) {
   const classes = useStyles({});
+  const { navLocation } = useNavLocationState();
+  const updateNavLocation = useNavLocationDispatch();
 
   return (
     <div className={classes.root}>
@@ -53,7 +59,7 @@ export default function AppNavigation({ children }: Props) {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" noWrap>
-            App Bar
+            {navLocation}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -68,13 +74,25 @@ export default function AppNavigation({ children }: Props) {
         <div className={classes.toolbar} />
         <Divider />
         <List>
-          <ListItem button>
+          <ListItem
+            selected={navLocation === "home"}
+            button
+            onClick={() =>
+              updateNavLocation({ type: "nextLocation", nextLocation: "home" })
+            }
+          >
             <ListItemIcon>
               <HomeIcon />
             </ListItemIcon>
             <ListItemText primary="Home" />
           </ListItem>
-          <ListItem button>
+          <ListItem
+            selected={navLocation === "map"}
+            button
+            onClick={() =>
+              updateNavLocation({ type: "nextLocation", nextLocation: "map" })
+            }
+          >
             <ListItemIcon>
               <MapIcon />
             </ListItemIcon>
