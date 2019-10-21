@@ -7,21 +7,21 @@ const GET_NAV_LOCATION = gql`
   }
 `;
 
-type NavLocationState = {
-  current: string;
-  previous: string;
-};
-
 // create a hook that returns the state NavLocation state
 export const useNavLocationState = () => {
   const { data } = useQuery(GET_NAV_LOCATION);
   return data;
 };
 
-type NavLocationAction = { type: "nextLocation"; nextLocation: "home" | "map" };
+type Location = "home" | "map";
 
-const navLocationDispatch = (state: NavLocationState, client) => {
-  return (action: NavLocationAction) => {
+type NavLocationAction = { type: "nextLocation"; nextLocation: Location };
+
+// create a hook that can update the local state
+export const useNavLocationDispatch = () => {
+  const client = useApolloClient();
+
+  const dispatch = (action: NavLocationAction) => {
     switch (action.type) {
       case "nextLocation":
         client.writeData({
@@ -34,11 +34,6 @@ const navLocationDispatch = (state: NavLocationState, client) => {
         throw new Error(`Unahandled action type ${action.type}`);
     }
   };
-};
 
-// create a hook that can update the local state
-export const useNavLocationDispatch = () => {
-  const { navLocation } = useNavLocationState();
-  const client = useApolloClient();
-  return navLocationDispatch(navLocation, client);
+  return dispatch;
 };
